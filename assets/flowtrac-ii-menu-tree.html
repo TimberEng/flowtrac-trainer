@@ -1,0 +1,437 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>FlowTrac-II · Menu Tree</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=IBM+Plex+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg:#f4f5f3;
+    --panel:#ffffff;
+    --ink:#1a201d;
+    --ink-soft:#5a635e;
+    --line:#d9ddd7;
+    --line-soft:#e8ebe6;
+    /* one hue per top-level branch */
+    --c1:#2f6f8f;   /* Monitor  */
+    --c2:#7a5aa6;   /* Position */
+    --c3:#c2662b;   /* Control  */
+    --c4:#3f8f5c;   /* Setup    */
+    --font-sans:"IBM Plex Sans",system-ui,-apple-system,Segoe UI,Roboto,sans-serif;
+    --font-mono:"IBM Plex Mono",ui-monospace,"SF Mono",Menlo,monospace;
+  }
+  *{box-sizing:border-box}
+  html{-webkit-text-size-adjust:100%}
+  body{
+    margin:0;background:var(--bg);color:var(--ink);
+    font-family:var(--font-sans);line-height:1.45;
+    padding:32px 20px 80px;
+  }
+  .wrap{max-width:960px;margin:0 auto}
+
+  /* ---- header ---- */
+  header{margin-bottom:24px}
+  .eyebrow{
+    font-family:var(--font-mono);font-size:12px;letter-spacing:.18em;
+    text-transform:uppercase;color:var(--ink-soft);margin:0 0 6px;
+  }
+  h1{
+    font-size:34px;font-weight:700;letter-spacing:-.02em;margin:0 0 4px;
+  }
+  .sub{color:var(--ink-soft);font-size:15px;margin:0}
+
+  /* ---- toolbar ---- */
+  .toolbar{
+    display:flex;flex-wrap:wrap;gap:10px;align-items:center;
+    margin:22px 0 18px;
+  }
+  .search{
+    flex:1 1 240px;position:relative;min-width:200px;
+  }
+  .search input{
+    width:100%;font-family:var(--font-sans);font-size:14px;
+    padding:10px 12px 10px 34px;border:1px solid var(--line);
+    border-radius:8px;background:var(--panel);color:var(--ink);
+    outline:none;transition:border-color .15s,box-shadow .15s;
+  }
+  .search input:focus{border-color:var(--c1);box-shadow:0 0 0 3px rgba(47,111,143,.15)}
+  .search svg{position:absolute;left:11px;top:50%;transform:translateY(-50%);
+    width:15px;height:15px;color:var(--ink-soft)}
+  .btn{
+    font-family:var(--font-sans);font-size:13px;font-weight:500;
+    padding:9px 14px;border:1px solid var(--line);border-radius:8px;
+    background:var(--panel);color:var(--ink);cursor:pointer;
+    transition:background .15s,border-color .15s;
+  }
+  .btn:hover{background:#eef1ec;border-color:#c7ccc4}
+  .btn:focus-visible{outline:2px solid var(--c1);outline-offset:2px}
+
+  /* ---- legend ---- */
+  .legend{display:flex;flex-wrap:wrap;gap:16px;margin:0 0 18px;
+    font-size:12.5px;color:var(--ink-soft)}
+  .legend span{display:inline-flex;align-items:center;gap:6px}
+  .dot{width:10px;height:10px;border-radius:3px;display:inline-block}
+
+  /* ---- tree ---- */
+  .tree{list-style:none;margin:0;padding:0}
+  .tree ul{list-style:none;margin:0;padding:0}
+
+  .node{position:relative}
+
+  .row{
+    display:flex;align-items:center;gap:10px;
+    padding:7px 12px;border-radius:8px;
+    border:1px solid transparent;
+    transition:background .12s;
+  }
+  .node.branch > .row{cursor:pointer}
+  .node.branch > .row:hover{background:var(--line-soft)}
+  .row:focus-visible{outline:2px solid currentColor;outline-offset:1px}
+
+  .twist{
+    width:16px;height:16px;flex:none;display:inline-flex;
+    align-items:center;justify-content:center;color:var(--ink-soft);
+    transition:transform .18s ease;
+  }
+  .node.leaf > .row .twist{visibility:hidden}
+  .node.collapsed > .row .twist{transform:rotate(-90deg)}
+
+  .code{
+    font-family:var(--font-mono);font-size:12.5px;font-weight:500;
+    color:#fff;padding:2px 7px;border-radius:5px;flex:none;
+    min-width:34px;text-align:center;letter-spacing:.01em;
+  }
+  .label{font-size:14.5px;font-weight:500}
+  .node.leaf .label{font-weight:400}
+  .count{
+    font-family:var(--font-mono);font-size:11px;color:var(--ink-soft);
+    margin-left:auto;flex:none;
+  }
+
+  /* nested container + guide line */
+  .children{
+    margin-left:19px;padding-left:20px;
+    border-left:1.5px solid var(--line);
+    overflow:hidden;
+  }
+  .node.collapsed > .children{display:none}
+
+  /* section tinting: colour the code chip + guide line by root branch */
+  .sec1 .code{background:var(--c1)} .sec1 > .children{border-color:var(--c1)}
+  .sec2 .code{background:var(--c2)} .sec2 > .children{border-color:var(--c2)}
+  .sec3 .code{background:var(--c3)} .sec3 > .children{border-color:var(--c3)}
+  .sec4 .code{background:var(--c4)} .sec4 > .children{border-color:var(--c4)}
+  .sec1 .row:focus-visible{outline-color:var(--c1)}
+  .sec2 .row:focus-visible{outline-color:var(--c2)}
+  .sec3 .row:focus-visible{outline-color:var(--c3)}
+  .sec4 .row:focus-visible{outline-color:var(--c4)}
+
+  /* top-level rows sit in their own card */
+  .tree > .node{
+    background:var(--panel);border:1px solid var(--line);
+    border-radius:12px;margin-bottom:12px;padding:6px;
+  }
+  .tree > .node > .row .label{font-weight:700;font-size:16px}
+  .tree > .node > .row .code{font-size:13px;padding:3px 9px}
+
+  /* search highlight / hide */
+  .hit > .row .label mark{background:#ffe39a;color:inherit;border-radius:2px;padding:0 1px}
+  .filtered{display:none !important}
+
+  .empty{color:var(--ink-soft);font-size:14px;padding:20px 4px;display:none}
+
+  footer{margin-top:32px;font-size:12px;color:var(--ink-soft);
+    font-family:var(--font-mono)}
+
+  @media (max-width:520px){
+    body{padding:20px 12px 60px}
+    h1{font-size:26px}
+    .children{margin-left:10px;padding-left:14px}
+  }
+
+  /* ---- print ---- */
+  @media print{
+    body{background:#fff;padding:0;color:#000}
+    .toolbar,footer{display:none}
+    .tree > .node{border-color:#bbb;break-inside:avoid;box-shadow:none}
+    .node.collapsed > .children{display:block !important}
+    .node.collapsed > .row .twist{transform:none}
+    .filtered{display:block !important}
+    .row:hover{background:none}
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <p class="eyebrow">Firmware Menu Reference</p>
+    <h1>FlowTrac-II</h1>
+    <p class="sub">Front-panel menu structure — Main Menu and all sub-menus.</p>
+  </header>
+
+  <div class="toolbar">
+    <div class="search">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.2-3.2"/></svg>
+      <input id="q" type="search" placeholder="Filter menu items…" autocomplete="off" aria-label="Filter menu items">
+    </div>
+    <button class="btn" id="expandAll">Expand all</button>
+    <button class="btn" id="collapseAll">Collapse all</button>
+  </div>
+
+  <div class="legend" aria-hidden="true">
+    <span><i class="dot" style="background:var(--c1)"></i>1 · Monitor</span>
+    <span><i class="dot" style="background:var(--c2)"></i>2 · Position</span>
+    <span><i class="dot" style="background:var(--c3)"></i>3 · Control</span>
+    <span><i class="dot" style="background:var(--c4)"></i>4 · Setup</span>
+  </div>
+
+  <ul class="tree" id="tree" aria-label="FlowTrac-II menu tree"></ul>
+  <p class="empty" id="empty">No menu items match your filter.</p>
+
+  <footer>FlowTrac-II · GeoComp flow/pressure controller · menu reference</footer>
+</div>
+
+<script>
+/* ---- menu data (edit here to update the tree) ---- */
+const MENU = [
+  { code:"1", label:"Monitor", children:[
+    { code:"1.1", label:"System" },
+    { code:"1.2", label:"Debug" },
+    { code:"1.3", label:"A/D" },
+    { code:"1.4", label:"Network" },
+    { code:"1.5", label:"Encoder" },
+  ]},
+  { code:"2", label:"Position", children:[
+    { code:"2.1", label:"Empty" },
+    { code:"2.2", label:"Fill" },
+    { code:"2.3", label:"Initialize" },
+    { code:"2.4", label:"Jog" },
+    { code:"2.5", label:"Control Valves" },
+  ]},
+  { code:"3", label:"Control", children:[
+    { code:"3.1", label:"Ramp Pressure", children:[
+      { code:"3.1.1", label:"Pressure Rate" },
+      { code:"3.1.2", label:"Final Pressure" },
+      { code:"3.1.3", label:"Maximum Flow" },
+      { code:"3.1.4", label:"Sampling Period" },
+      { code:"3.1.5", label:"View Settings" },
+      { code:"3.1.6", label:"Start" },
+    ]},
+    { code:"3.2", label:"Cyclic Pressure", children:[
+      { code:"3.2.1", label:"Seating Press" },
+      { code:"3.2.2", label:"Press Amplitude" },
+      { code:"3.2.3", label:"Cycle Period" },
+      { code:"3.2.4", label:"Sampling Period" },
+      { code:"3.2.5", label:"View Settings" },
+      { code:"3.2.6", label:"Start" },
+    ]},
+    { code:"3.3", label:"Ramp Flow", children:[
+      { code:"3.3.1", label:"Flow Rate" },
+      { code:"3.3.2", label:"Final Flow" },
+      { code:"3.3.3", label:"Maximum Press" },
+      { code:"3.3.4", label:"Sampling Period" },
+      { code:"3.3.5", label:"View Settings" },
+      { code:"3.3.6", label:"Start" },
+    ]},
+    { code:"3.4", label:"Cyclic Flow", children:[
+      { code:"3.4.1", label:"Flow Offset" },
+      { code:"3.4.2", label:"Flow Amplitude" },
+      { code:"3.4.3", label:"Cycle Period" },
+      { code:"3.4.4", label:"Sampling Period" },
+      { code:"3.4.5", label:"View Settings" },
+      { code:"3.4.6", label:"Start" },
+    ]},
+  ]},
+  { code:"4", label:"Setup", children:[
+    { code:"4.1", label:"System", children:[
+      { code:"4.1.1", label:"A/D Channels" },
+      { code:"4.1.2", label:"Units" },
+      { code:"4.1.3", label:"Restart" },
+      { code:"4.1.4", label:"Save/Restore", children:[
+        { code:"4.1.4.1", label:"Save A" },
+        { code:"4.1.4.2", label:"Save B" },
+        { code:"4.1.4.3", label:"Restore A" },
+        { code:"4.1.4.4", label:"Restore B" },
+      ]},
+      { code:"4.1.5", label:"Firmware Update" },
+      { code:"4.1.6", label:"Revision" },
+    ]},
+    { code:"4.2", label:"Network", children:[
+      { code:"4.2.1", label:"Node ID Setup" },
+    ]},
+    { code:"4.3", label:"A/D", children:[
+      { code:"4.3.1", label:"Channel 1", children:[
+        { code:"4.3.1.1", label:"Type" },
+        { code:"4.3.1.2", label:"Excitation" },
+        { code:"4.3.1.3", label:"Polarity" },
+        { code:"4.3.1.4", label:"Range" },
+        { code:"4.3.1.5", label:"Factor" },
+        { code:"4.3.1.6", label:"Offset" },
+        { code:"4.3.1.7", label:"Low. Lim." },
+        { code:"4.3.1.8", label:"Up. Lim." },
+        { code:"4.3.1.9", label:"Advanced", children:[
+          { code:"4.3.1.9.1", label:"Mode" },
+          { code:"4.3.1.9.2", label:"Rate" },
+          { code:"4.3.1.9.3", label:"Filter" },
+          { code:"4.3.1.9.4", label:"Chop" },
+          { code:"4.3.1.9.5", label:"Fast" },
+        ]},
+      ]},
+      { code:"4.3.2", label:"Channel 2", children:[
+        { code:"4.3.2.1", label:"Type" },
+        { code:"4.3.2.2", label:"Excitation" },
+        { code:"4.3.2.3", label:"Polarity" },
+        { code:"4.3.2.4", label:"Range" },
+        { code:"4.3.2.5", label:"Factor" },
+        { code:"4.3.2.6", label:"Offset" },
+        { code:"4.3.2.7", label:"Low. Lim." },
+        { code:"4.3.2.8", label:"Up. Lim." },
+        { code:"4.3.2.9", label:"Advanced", children:[
+          { code:"4.3.2.9.1", label:"Mode" },
+          { code:"4.3.2.9.2", label:"Rate" },
+          { code:"4.3.2.9.3", label:"Filter" },
+          { code:"4.3.2.9.4", label:"Chop" },
+          { code:"4.3.2.9.5", label:"Fast" },
+        ]},
+      ]},
+    ]},
+    { code:"4.4", label:"PID", children:[
+      { code:"4.4.1", label:"P-Gain" },
+      { code:"4.4.2", label:"I-Gain" },
+      { code:"4.4.3", label:"D-Gain" },
+      { code:"4.4.4", label:"V-Offset" },
+      { code:"4.4.5", label:"I-Limit" },
+      { code:"4.4.6", label:"V-Limit" },
+      { code:"4.4.7", label:"Dither Ampl." },
+      { code:"4.4.8", label:"Dither Freq." },
+      { code:"4.4.9", label:"Advanced", children:[
+        { code:"4.4.9.1", label:"Filter" },
+        { code:"4.4.9.2", label:"FB Channel" },
+        { code:"4.4.9.3", label:"Anti-Windup" },
+        { code:"4.4.9.4", label:"Derivative FB" },
+      ]},
+    ]},
+    { code:"4.5", label:"Motor", children:[
+      { code:"4.5.1", label:"Frequency" },
+      { code:"4.5.2", label:"Acceleration" },
+      { code:"4.5.3", label:"Step Capacity" },
+      { code:"4.5.4", label:"Step Factor" },
+    ]},
+  ]},
+];
+
+/* ---- render ---- */
+const tree = document.getElementById("tree");
+const chevron = '<svg viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="m6 9 6 6 6-6"/></svg>';
+
+function countLeaves(node){
+  if(!node.children) return 1;
+  return node.children.reduce((s,c)=>s+countLeaves(c),0);
+}
+
+function build(node, sectionClass){
+  const li = document.createElement("li");
+  const hasKids = node.children && node.children.length;
+  li.className = "node " + (hasKids ? "branch" : "leaf") + " " + sectionClass;
+  if(hasKids) li.classList.add("collapsed"); // start collapsed
+
+  const row = document.createElement("div");
+  row.className = "row";
+  row.setAttribute("role","treeitem");
+  row.tabIndex = 0;
+  row.innerHTML =
+    '<span class="twist">'+(hasKids?chevron:"")+'</span>'+
+    '<span class="code">'+node.code+'</span>'+
+    '<span class="label">'+node.label+'</span>'+
+    (hasKids?'<span class="count">'+countLeaves(node)+'</span>':'');
+  li.appendChild(row);
+
+  if(hasKids){
+    const ul = document.createElement("ul");
+    ul.className = "children";
+    node.children.forEach(c => ul.appendChild(build(c, sectionClass)));
+    li.appendChild(ul);
+    const toggle = () => li.classList.toggle("collapsed");
+    row.addEventListener("click", toggle);
+    row.addEventListener("keydown", e=>{
+      if(e.key==="Enter"||e.key===" "){ e.preventDefault(); toggle(); }
+    });
+  }
+  return li;
+}
+
+MENU.forEach(root => tree.appendChild(build(root, "sec"+root.code)));
+
+/* ---- expand / collapse all ---- */
+const allBranches = () => [...tree.querySelectorAll(".node.branch")];
+document.getElementById("expandAll").onclick = () =>
+  allBranches().forEach(n=>n.classList.remove("collapsed"));
+document.getElementById("collapseAll").onclick = () =>
+  allBranches().forEach(n=>n.classList.add("collapsed"));
+
+/* ---- search / filter ---- */
+const q = document.getElementById("q");
+const empty = document.getElementById("empty");
+
+function clearMarks(){
+  tree.querySelectorAll("mark").forEach(m=>{
+    m.replaceWith(document.createTextNode(m.textContent));
+  });
+  tree.querySelectorAll(".label").forEach(l=>l.normalize());
+}
+
+function resetFilter(){
+  clearMarks();
+  tree.querySelectorAll(".node").forEach(n=>{
+    n.classList.remove("filtered","hit");
+    if(n.classList.contains("branch")) n.classList.add("collapsed");
+  });
+}
+
+q.addEventListener("input", ()=>{
+  const term = q.value.trim().toLowerCase();
+  clearMarks();
+  if(!term){ resetFilter(); empty.style.display="none"; return; }
+
+  let anyHit = false;
+  const nodes = [...tree.querySelectorAll(".node")];
+  nodes.forEach(n=>{ n.classList.remove("filtered","hit"); });
+
+  nodes.forEach(n=>{
+    const labelEl = n.querySelector(":scope > .row .label");
+    const codeEl  = n.querySelector(":scope > .row .code");
+    const text = (labelEl.textContent + " " + codeEl.textContent).toLowerCase();
+    if(text.includes(term)){
+      n.classList.add("hit");
+      anyHit = true;
+      // highlight in label
+      const lbl = labelEl.textContent;
+      const i = lbl.toLowerCase().indexOf(term);
+      if(i>-1){
+        labelEl.innerHTML = lbl.slice(0,i)+"<mark>"+lbl.slice(i,i+term.length)+"</mark>"+lbl.slice(i+term.length);
+      }
+    }
+  });
+
+  // show a node if it is a hit OR has a descendant hit; reveal ancestors of hits
+  nodes.forEach(n=>{
+    const selfHit = n.classList.contains("hit");
+    const descHit = n.querySelector(".node.hit");
+    if(selfHit || descHit){
+      n.classList.remove("filtered","collapsed"); // expand path to matches
+    } else {
+      n.classList.add("filtered");
+    }
+  });
+
+  empty.style.display = anyHit ? "none" : "block";
+});
+
+// Esc clears the search
+q.addEventListener("keydown", e=>{ if(e.key==="Escape"){ q.value=""; resetFilter(); empty.style.display="none"; }});
+</script>
+</body>
+</html>

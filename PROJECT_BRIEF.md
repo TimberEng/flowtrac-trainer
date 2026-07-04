@@ -72,5 +72,6 @@ Menus are generated from `data/menu.js`; leaves fall back to the stub.
 
 ## Open items — need real device captures before finalizing
 - Exact **main-menu title** text (currently a placeholder "Main Menu").
-- Exact format for **menus longer than 6 items** (e.g. PID has 8) — current handling is a reasonable guess.
+- Exact format for **menus longer than 6 items** (e.g. PID has 8) — current handling (drop title, 4 rows, 2 columns) is a reasonable guess and is confirmed working for exactly 8 items.
+- **9-item menus exceed the current display capacity.** The manual's Table 1 gives A/D Channel 1/2 setup and PID setup a 9th "Advanced" option, but 4 lines × 2 columns only seats 8 numbered items on screen. The 9th item (`Advanced`) is in the menu tree and still reachable by pressing its number key, but isn't drawn — real device captures of these screens are needed to learn the actual layout (a second page? a differently spaced row?) before `menuLines()` in `js/engine.js` can render it.
 - Not-yet-captured panels: Empty (2.1), Fill (2.2), Initialize (2.3), Jog (2.4), all Monitor screens (1.x), all Control leaves (3.x.x), all Setup leaves (4.x.x). Each arrives as a screenshot and becomes one file in `data/screens/`.

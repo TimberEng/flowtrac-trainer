@@ -1,5 +1,7 @@
 /* =====================================================================
    FlowTrac-II menu tree — the firmware menu structure, indexed by code.
+   Source: FlowTrac-II v56 User's Manual, Section 2.1 (Manual Operation)
+   and Table 1 (Summary of FlowTrac Settings).
    ===================================================================== */
 const MONITOR = { code:"1", label:"Monitor", children:[
   { code:"1.1", label:"System" }, { code:"1.2", label:"Debug" },
@@ -17,29 +19,53 @@ const CONTROL = { code:"3", label:"Control", children:[
     {code:"3.1.3",label:"Maximum Flow"},{code:"3.1.4",label:"Sampling Period"},
     {code:"3.1.5",label:"View Settings"},{code:"3.1.6",label:"Start"} ]},
   { code:"3.2", label:"Cyclic Pressure", children:[
-    {code:"3.2.1",label:"Seating Pressure"},{code:"3.2.2",label:"Pressure Amplitude"},
+    {code:"3.2.1",label:"Seating Press"},{code:"3.2.2",label:"Press Amplitude"},
     {code:"3.2.3",label:"Cycle Period"},{code:"3.2.4",label:"Sampling Period"},
     {code:"3.2.5",label:"View Settings"},{code:"3.2.6",label:"Start"} ]},
   { code:"3.3", label:"Ramp Flow", children:[
     {code:"3.3.1",label:"Flow Rate"},{code:"3.3.2",label:"Final Flow"},
-    {code:"3.3.3",label:"Maximum Pressure"},{code:"3.3.4",label:"Sampling Period"},
+    {code:"3.3.3",label:"Maximum Press"},{code:"3.3.4",label:"Sampling Period"},
     {code:"3.3.5",label:"View Settings"},{code:"3.3.6",label:"Start"} ]},
   { code:"3.4", label:"Cyclic Flow", children:[
-    {code:"3.4.1",label:"Seating Flow"},{code:"3.4.2",label:"Flow Amplitude"},
+    {code:"3.4.1",label:"Flow Offset"},{code:"3.4.2",label:"Flow Amplitude"},
     {code:"3.4.3",label:"Cycle Period"},{code:"3.4.4",label:"Sampling Period"},
     {code:"3.4.5",label:"View Settings"},{code:"3.4.6",label:"Start"} ]},
 ]};
+
+/* A/D channel setup is identical for Channel 1 and Channel 2 (Table 1) */
+function adChannelSetup(prefix){
+  return [
+    {code:prefix+".1",label:"Type"},{code:prefix+".2",label:"Excitation"},
+    {code:prefix+".3",label:"Polarity"},{code:prefix+".4",label:"Range"},
+    {code:prefix+".5",label:"Factor"},{code:prefix+".6",label:"Offset"},
+    {code:prefix+".7",label:"Low. Lim."},{code:prefix+".8",label:"Up. Lim."},
+    {code:prefix+".9",label:"Advanced", children:[
+      {code:prefix+".9.1",label:"Mode"},{code:prefix+".9.2",label:"Rate"},
+      {code:prefix+".9.3",label:"Filter"},{code:prefix+".9.4",label:"Chop"},
+      {code:prefix+".9.5",label:"Fast"} ]},
+  ];
+}
+
 const SETUP = { code:"4", label:"Setup", children:[
   { code:"4.1", label:"System", children:[
     {code:"4.1.1",label:"A/D Channels"},{code:"4.1.2",label:"Units"},
-    {code:"4.1.3",label:"Restart"},{code:"4.1.4",label:"Save/Restore"},
+    {code:"4.1.3",label:"Restart"},
+    {code:"4.1.4",label:"Save/Restore", children:[
+      {code:"4.1.4.1",label:"Save A"},{code:"4.1.4.2",label:"Save B"},
+      {code:"4.1.4.3",label:"Restore A"},{code:"4.1.4.4",label:"Restore B"} ]},
     {code:"4.1.5",label:"Firmware Update"},{code:"4.1.6",label:"Revision"} ]},
   { code:"4.2", label:"Network", children:[ {code:"4.2.1",label:"Node ID Setup"} ]},
-  { code:"4.3", label:"A/D", children:[ {code:"4.3.1",label:"Channel X"} ]},
+  { code:"4.3", label:"A/D", children:[
+    { code:"4.3.1", label:"Channel 1", children:adChannelSetup("4.3.1") },
+    { code:"4.3.2", label:"Channel 2", children:adChannelSetup("4.3.2") },
+  ]},
   { code:"4.4", label:"PID", children:[
     {code:"4.4.1",label:"P-Gain"},{code:"4.4.2",label:"I-Gain"},{code:"4.4.3",label:"D-Gain"},
     {code:"4.4.4",label:"V-Offset"},{code:"4.4.5",label:"I-Limit"},{code:"4.4.6",label:"V-Limit"},
-    {code:"4.4.7",label:"Dither Ampl."},{code:"4.4.8",label:"Dither Freq."} ]},
+    {code:"4.4.7",label:"Dither Ampl."},{code:"4.4.8",label:"Dither Freq."},
+    {code:"4.4.9",label:"Advanced", children:[
+      {code:"4.4.9.1",label:"Filter"},{code:"4.4.9.2",label:"FB Channel"},
+      {code:"4.4.9.3",label:"Anti-Windup"},{code:"4.4.9.4",label:"Derivative FB"} ]} ]},
   { code:"4.5", label:"Motor", children:[
     {code:"4.5.1",label:"Frequency"},{code:"4.5.2",label:"Acceleration"},
     {code:"4.5.3",label:"Step Capacity"},{code:"4.5.4",label:"Step Factor"} ]},
