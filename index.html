@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>FlowTrac-II · Interactive Trainer</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=IBM+Plex+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="css/styles.css">
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <p class="eyebrow">Interactive Trainer</p>
+    <h1>FlowTrac-II</h1>
+    <p class="sub">Learn the pressure-volume controller by driving it. Press keys on the panel (or your keyboard) and watch the display and indicator lights respond — just like the real unit.</p>
+  </header>
+
+  <div class="stage">
+    <!-- ============ DEVICE ============ -->
+    <section class="device" aria-label="FlowTrac-II front panel">
+      <div class="brand"><b>FlowTrac-II</b><span>Pressure-Volume Controller</span></div>
+
+      <div class="lcd-shell">
+        <div class="lcd" id="lcd" role="img" aria-label="Front-panel display"></div>
+      </div>
+
+      <div class="keypad" id="keypad" aria-label="Keypad"></div>
+
+      <div class="leds" id="leds" aria-label="Indicator lights"></div>
+    </section>
+
+    <!-- ============ INFO ============ -->
+    <div>
+      <p class="crumb" id="crumb"></p>
+
+      <div class="card" id="helpCard">
+        <h2>This screen</h2>
+        <div id="help"></div>
+      </div>
+
+      <div class="card">
+        <h2>Guided lessons</h2>
+        <div class="lesson-pick" id="lessonPick"></div>
+        <div id="lessonBody"></div>
+      </div>
+
+      <p class="hintbar">Tip: keyboard works too — digits, <b>.</b> <b>-</b>, <b>Enter</b>=Ent, <b>Esc</b>, arrows, <b>M</b>=Menu.</p>
+    </div>
+  </div>
+
+  <footer id="footer">FlowTrac-II · GeoComp pressure-volume controller · trainer skeleton</footer>
+</div>
+
+<!-- Screen registry + engine must load before the data/screens/*.js files
+     below, since each screen file calls Screens.register() at load time. -->
+<script src="js/engine.js"></script>
+
+<!-- data: menu tree, lessons, and one file per captured panel -->
+<script src="data/menu.js"></script>
+<script src="data/lessons.js"></script>
+<script src="data/screens/control-valves.js"></script>
+
+<!-- device + ui rendering -->
+<script src="js/device.js"></script>
+<script src="js/ui.js"></script>
+
+<!-- boot, runs last -->
+<script src="js/main.js"></script>
+</body>
+</html>
