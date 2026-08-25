@@ -45,6 +45,39 @@ function renderLEDs(){
   ledsEl.innerHTML=html;
 }
 
+/* ---- hydraulic circuit diagram: supply tank, cylinder, output ----
+   Supply is drawn as always full (unlimited). The cylinder fill level
+   comes from state.cylinderPct (randomised once per page load, then
+   driven for real by Empty/Fill/Initialize/Jog — see engine.js's
+   runMotion). The valve circle/colour reflects valve position
+   (outputValve open/closed); the animated flow-dot on each link
+   reflects actual water movement (state.flowOut/flowIn) — a valve can
+   be open with nothing moving, just like on the real unit. */
+const cylWaterEl=document.getElementById("cylWater");
+const cylPctEl=document.getElementById("cylPct");
+const outputShapeEl=document.getElementById("outputShape");
+const outputSubEl=document.getElementById("outputSub");
+const linkSupplyEl=document.getElementById("linkSupply");
+const linkOutputEl=document.getElementById("linkOutput");
+const valveSupplyEl=document.getElementById("valveSupply");
+const valveOutputEl=document.getElementById("valveOutput");
+
+function renderHydraulics(){
+  cylWaterEl.style.height = state.cylinderPct + "%";
+  cylPctEl.textContent = state.cylinderPct;
+
+  const outOpen = state.outputValve === "open";
+  outputShapeEl.classList.toggle("open", outOpen);
+  outputSubEl.textContent = state.flowOut ? "draining to test cell"
+    : outOpen ? "valve open — to test cell" : "to test cell — valve closed";
+  linkOutputEl.classList.toggle("flowing", state.flowOut);
+  valveOutputEl.classList.toggle("open", outOpen);
+
+  const supOpen = state.supplyValve === "open";
+  linkSupplyEl.classList.toggle("flowing", state.flowIn);
+  valveSupplyEl.classList.toggle("open", supOpen);
+}
+
 /* =====================================================================
    KEYPAD  (4 cols x 5 rows, matching the hardware)
    ===================================================================== */

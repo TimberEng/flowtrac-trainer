@@ -31,8 +31,8 @@
       <div class="leds" id="leds" aria-label="Indicator lights"></div>
     </section>
 
-    <!-- ============ INFO ============ -->
-    <div>
+    <!-- ============ MIDDLE: this screen + hydraulic circuit ============ -->
+    <div class="info-mid">
       <p class="crumb" id="crumb"></p>
 
       <div class="card" id="helpCard">
@@ -40,6 +40,47 @@
         <div id="help"></div>
       </div>
 
+      <section class="card hydraulics" aria-label="Hydraulic circuit diagram">
+        <h2>Hydraulic Circuit</h2>
+        <div class="hydro">
+          <div class="hydro-node">
+            <div class="tank-shape" aria-hidden="true">
+              <div class="tank-water"></div>
+              <span class="tank-inf">∞</span>
+            </div>
+            <p class="hydro-name">Supply</p>
+            <p class="hydro-sub">unlimited water source</p>
+          </div>
+
+          <div class="hydro-link" id="linkSupply">
+            <span class="flow-dot"></span>
+            <div class="valve" id="valveSupply" title="Supply Valve"><i class="valve-handle"></i></div>
+          </div>
+
+          <div class="hydro-node">
+            <div class="cyl-shape" aria-hidden="true">
+              <div class="cyl-water" id="cylWater"></div>
+            </div>
+            <p class="hydro-name">FlowTrac Cylinder</p>
+            <p class="hydro-sub"><span id="cylPct">--</span>% full</p>
+          </div>
+
+          <div class="hydro-link" id="linkOutput">
+            <span class="flow-dot"></span>
+            <div class="valve" id="valveOutput" title="Output Valve"><i class="valve-handle"></i></div>
+          </div>
+
+          <div class="hydro-node">
+            <div class="output-shape" id="outputShape" aria-hidden="true">&rarr;</div>
+            <p class="hydro-name">Output</p>
+            <p class="hydro-sub" id="outputSub">to test cell</p>
+          </div>
+        </div>
+      </section>
+    </div>
+
+    <!-- ============ RIGHT: guided lessons ============ -->
+    <div class="info-side">
       <div class="card">
         <h2>Guided lessons</h2>
         <div class="lesson-pick" id="lessonPick"></div>
@@ -61,6 +102,10 @@
 <script src="data/menu.js"></script>
 <script src="data/lessons.js"></script>
 <script src="data/screens/control-valves.js"></script>
+<script src="data/screens/empty.js"></script>
+<script src="data/screens/fill.js"></script>
+<script src="data/screens/initialize.js"></script>
+<script src="data/screens/jog.js"></script>
 
 <!-- device + ui rendering -->
 <script src="js/device.js"></script>

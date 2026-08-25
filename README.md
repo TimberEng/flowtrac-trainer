@@ -67,8 +67,19 @@ is the single extension point for the whole project.
 ## Status
 
 - Implemented: full menu tree, two-column menu rendering, LED bank, help
-  panel, one guided lesson ("Operate the control valves"), and the
-  **Control Valves** (2.5) panel.
-- Still placeholders, pending real device captures: Empty (2.1), Fill (2.2),
-  Initialize (2.3), Jog (2.4), all Monitor screens (1.x), all Control leaves
-  (3.x.x), all Setup leaves (4.x.x).
+  panel, one guided lesson ("Operate the control valves"), the
+  **Control Valves** (2.5) panel, and a live "Hydraulic Circuit" diagram
+  (Supply tank, flow pump cylinder, Output) driven by the same state.
+- Also implemented: **Empty** (2.1), **Fill** (2.2), **Initialize** (2.3)
+  and a simplified **Jog** (2.4) — the flow pump cylinder's fill level
+  (`state.cylinderPct`, randomised each page load) animates in real time
+  via the shared `runMotion`/`stopMotion` helpers in `js/engine.js`, and
+  can be interrupted mid-motion by pressing any key, matching the manual.
+  Draining requires the Output Valve already open and filling requires the
+  Supply Valve already open (Position → Control Valves) — the same
+  interlock the manual calls out for Jog (2.1.2.4), applied consistently
+  to every operation that moves water.
+- Still placeholders, pending real device captures: all Monitor screens
+  (1.x), all Control leaves (3.x.x), all Setup leaves (4.x.x). Jog is a
+  simplified version — the real panel also lets you dial in an exact
+  steps/sec speed with the 0-4 keys before pressing an arrow.

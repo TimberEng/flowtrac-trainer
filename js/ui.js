@@ -61,7 +61,7 @@ function renderLesson(){
     html+=`<li class="${cls}"><span class="mark">${mark}</span><span>${s.t}</span></li>`;
   });
   html+="</ol>";
-  if(complete) html+='<div class="done-banner">Done — you\'ve operated both valves. Pick another lesson or explore the menus freely.</div>';
+  if(complete) html+='<div class="done-banner">Done! Pick another lesson or explore the menus freely.</div>';
   lessonBody.innerHTML=html;
 }
 function afterInput(){

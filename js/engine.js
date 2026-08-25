@@ -22,7 +22,36 @@ const state = {
   limitEmpty:false, limitFull:false, flowOut:false, flowIn:false,
   outputValve:"closed",   // "open" | "closed"
   supplyValve:"closed",
+  cylinderPct: Math.floor(Math.random()*101), // flow pump cylinder fill level, 0-100%, reseeded on every page load
 };
+
+/* ---- shared motor-motion helper — used by Empty/Fill/Initialize/Jog.
+   Animates state.cylinderPct toward a target, ticking state.flowOut /
+   state.flowIn (and the limit switches) along the way, so the LEDs and
+   the hydraulics diagram follow real, interruptible motion instead of an
+   instant jump. Any screen that starts motion should stop it in its
+   `stop()` hook so navigating away (Esc/Menu) doesn't leave it running. */
+let motionTimer = null;
+function isMotionRunning(){ return motionTimer !== null; }
+function syncLimits(){ state.limitEmpty = state.cylinderPct<=0; state.limitFull = state.cylinderPct>=100; }
+function stopMotion(){
+  if(motionTimer){ clearInterval(motionTimer); motionTimer=null; }
+  state.flowOut=false; state.flowIn=false;
+}
+function runMotion(dir, target, onDone){        // dir: "empty" (draining) | "fill" (filling)
+  stopMotion();
+  state.flowOut = dir==="empty"; state.flowIn = dir==="fill";
+  const step = 4;                               // percent per tick — a few seconds end to end
+  motionTimer = setInterval(()=>{
+    state.cylinderPct = dir==="empty"
+      ? Math.max(target, state.cylinderPct-step)
+      : Math.min(target, state.cylinderPct+step);
+    syncLimits();
+    if(state.cylinderPct===target){ stopMotion(); onDone && onDone(); }
+    render(); afterInput();   // let guided-lesson steps advance live as the level moves
+  }, 150);
+}
+syncLimits();
 
 /* ---- navigation ---- */
 let stack = [""];                       // navigation stack of codes
@@ -30,9 +59,13 @@ const sel = {};                         // menu code -> selected index
 const visited = new Set();              // codes ever reached (for lessons)
 const current = () => stack[stack.length-1];
 
+function leaveCurrentScreen(){
+  const screen = Screens.get(current());
+  if(screen && screen.stop) screen.stop(state);
+}
 function go(code){ stack.push(code); sel[code]=sel[code]||0; visited.add(code); render(); afterInput(); }
-function back(){ if(stack.length>1) stack.pop(); render(); afterInput(); }
-function home(){ stack=[""]; render(); afterInput(); }
+function back(){ leaveCurrentScreen(); if(stack.length>1) stack.pop(); render(); afterInput(); }
+function home(){ leaveCurrentScreen(); stack=[""]; render(); afterInput(); }
 
 function press(k){
   const code = current();
@@ -97,6 +130,7 @@ function render(){
   const {lines, active} = screenLines();
   renderLCD(lines, active);
   renderLEDs();
+  renderHydraulics();
   renderCrumb();
   renderHelp();
 }
